@@ -1,0 +1,549 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>மெய்ம்மைக் கற்றல்</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Noto+Sans+Tamil:wght@400;500;700&family=Noto+Serif+Tamil:wght@600;800&display=swap">
+<style>
+/* Layout: one slide at a time inside a scrolling stage; sticky header strip above, prev/next + segment progress below. Tap targets reveal detail in place. */
+:root {
+  --bg: #EDF2EE;
+  --surface: #FFFFFF;
+  --fg: #13231F;
+  --muted: #4B5F58;
+  --line: #C5D3CC;
+  --accent: #0B6E5F;
+  --accent-fg: #FFFFFF;
+  --accent-soft: #D6EBE4;
+  --hi: #E8A900;
+  --hi-soft: #FBEEBF;
+  --hi-fg: #4A3500;
+  --font-display: 'Noto Serif Tamil', 'Latha', 'Nirmala UI', serif;
+  --font-body: 'Noto Sans Tamil', 'Latha', 'Nirmala UI', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C1715; --surface: #14241F; --fg: #E5F0EB; --muted: #9DB4AC; --line: #2B403A;
+    --accent: #4FC3AA; --accent-fg: #06241D; --accent-soft: #17352E;
+    --hi: #F2C230; --hi-soft: #3A3210; --hi-fg: #F7E3A0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C1715; --surface: #14241F; --fg: #E5F0EB; --muted: #9DB4AC; --line: #2B403A;
+  --accent: #4FC3AA; --accent-fg: #06241D; --accent-soft: #17352E;
+  --hi: #F2C230; --hi-soft: #3A3210; --hi-fg: #F7E3A0;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--hi); outline-offset: 2px; }
+
+#app { height: 100%; display: flex; flex-direction: column; max-width: 980px; margin: 0 auto; }
+.top {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding-block: 10px 8px; border-bottom: 1px solid var(--line);
+  font-size: 13px; color: var(--muted);
+}
+.top b { color: var(--accent); font-weight: 700; }
+.top .count { font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
+
+#stage { flex: 1; min-height: 0; overflow-y: auto; padding-block: 18px 20px; }
+#stage > .slide { padding-bottom: 38vh; }
+.slide { animation: in .35s ease both; }
+@keyframes in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+.slide.back { animation-name: inback; }
+@keyframes inback { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .slide, .slide.back { animation: none; } * { transition: none !important; } }
+
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.4; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(26px, 6.4vw, 44px); font-weight: 800; }
+h2 { font-size: clamp(22px, 5vw, 32px); font-weight: 800; }
+h3 { font-size: 17px; font-weight: 600; }
+p { margin: 0; max-width: 65ch; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.hint { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.hint::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--hi); flex: none; }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.stack-s { display: flex; flex-direction: column; gap: 8px; }
+
+/* title slide */
+.cover { display: flex; flex-direction: column; gap: 20px; }
+.cover .def { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+.cover .def em { font-style: normal; font-weight: 700; color: var(--accent); }
+.reveal-btn {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 10px;
+  background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 999px;
+  padding: 10px 18px; font-weight: 700;
+}
+.reveal-btn .pm { font-family: var(--font-mono); font-size: 18px; line-height: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  border: 1px solid var(--accent); color: var(--accent); background: transparent;
+  border-radius: 999px; padding: 4px 14px; font-size: 15px; font-weight: 500;
+}
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+.chip.static { cursor: default; background: var(--accent-soft); border-color: transparent; color: var(--fg); }
+
+/* overview */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.tile {
+  text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; min-width: 0;
+  transition: border-color .15s, transform .15s;
+}
+.tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+.tile .n { font-family: var(--font-mono); font-size: 20px; color: var(--accent); line-height: 1.5; }
+.tile .t { font-weight: 500; line-height: 1.5; min-width: 0; }
+.tile .e { display: block; font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+
+/* method slide */
+.mhead { display: flex; gap: 14px; align-items: flex-start; }
+.mhead .big { font-family: var(--font-mono); font-size: clamp(40px, 10vw, 64px); line-height: 1; color: var(--accent); }
+.mhead .eng { font-family: var(--font-mono); font-size: 13px; color: var(--muted); margin-top: 4px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.card > button.card-head {
+  width: 100%; text-align: left; background: none; border: 0; padding: 12px 16px;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  font-weight: 700; color: var(--accent);
+}
+.card .body { padding: 0 16px 16px; }
+.pm { font-family: var(--font-mono); font-size: 20px; line-height: 1; flex: none; }
+.cols { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: start; }
+@media (min-width: 760px) { .cols { grid-template-columns: 1fr 1fr; } }
+.skills { display: flex; flex-direction: column; gap: 8px; }
+.skill { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.skill.open { border-color: var(--accent); }
+.skill > button {
+  width: 100%; text-align: left; background: none; border: 0; padding: 10px 14px;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; font-weight: 700;
+}
+.skill > button .pm { color: var(--accent); }
+.skill .desc { padding: 0 14px 12px; background: var(--accent-soft); padding-top: 10px; }
+.skill.plain > div.plain-row { padding: 10px 14px; font-weight: 700; }
+.row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.link-btn { background: none; border: 0; color: var(--accent); font-weight: 700; padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; }
+
+/* summary */
+.rows { display: flex; flex-direction: column; gap: 8px; }
+.srow {
+  text-align: left; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 10px 14px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px;
+  transition: opacity .2s, border-color .2s, background .2s;
+}
+@media (min-width: 760px) { .srow { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 18px; align-items: center; } }
+.srow .m { font-weight: 700; }
+.srow .s { color: var(--muted); font-size: 15px; }
+.srow.on { border-color: var(--hi); background: var(--hi-soft); color: var(--hi-fg); }
+.srow.on .s { color: var(--hi-fg); }
+.srow.dim { opacity: .35; }
+.srow .go { font-family: var(--font-mono); color: var(--accent); margin-right: 6px; }
+
+/* cycle */
+.steps { display: flex; flex-direction: column; position: relative; }
+.step { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; }
+.step .rail { display: flex; flex-direction: column; align-items: center; }
+.step .dot {
+  width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent);
+  display: grid; place-items: center; font-family: var(--font-mono); background: var(--bg); flex: none;
+}
+.step.open .dot { background: var(--accent); color: var(--accent-fg); }
+.step .line { flex: 1; width: 2px; background: var(--line); margin-block: 2px; }
+.step:last-child .line { display: none; }
+.step .main { padding-bottom: 14px; min-width: 0; }
+.step > .main > button {
+  width: 100%; text-align: left; background: none; border: 0; padding: 4px 0 6px; font-weight: 700;
+  display: flex; justify-content: space-between; gap: 10px; align-items: flex-start;
+}
+.step .detail { background: var(--accent-soft); border-radius: 6px; padding: 10px 14px; }
+
+/* teacher */
+.seg { display: inline-flex; border: 1px solid var(--accent); border-radius: 999px; overflow: hidden; flex-wrap: wrap; }
+.seg button { background: transparent; border: 0; padding: 8px 16px; font-weight: 700; color: var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+.chain { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; counter-reset: c; }
+.chain div { background: var(--surface); border: 1px solid var(--accent); border-radius: 6px; padding: 10px 12px; font-weight: 500; }
+.chain div::before { counter-increment: c; content: counter(c); display: block; font-family: var(--font-mono); color: var(--accent); }
+.single { background: var(--surface); border: 1px dashed var(--muted); border-radius: 6px; padding: 14px 16px; }
+.opps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.opps div { background: var(--hi-soft); color: var(--hi-fg); border-radius: 6px; padding: 10px 14px; font-weight: 500; }
+
+/* conclusion */
+.quals { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.qual { background: var(--accent); color: var(--accent-fg); border-radius: 6px; padding: 14px 16px; font-family: var(--font-display); font-weight: 600; line-height: 1.5; }
+
+/* footer nav */
+.bottom { padding-block: 8px 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.segs { display: flex; gap: 3px; }
+.segs button { flex: 1; height: 22px; background: none; border: 0; padding: 8px 0; min-width: 0; }
+.segs button i { display: block; height: 6px; border-radius: 3px; background: var(--line); }
+.segs button.done i { background: var(--accent); opacity: .45; }
+.segs button.cur i { background: var(--accent); opacity: 1; }
+.navrow { display: flex; justify-content: space-between; gap: 10px; }
+.nav {
+  flex: 1; max-width: 220px; border-radius: 999px; padding: 10px 18px; font-weight: 700;
+  border: 2px solid var(--accent); background: transparent; color: var(--accent);
+}
+.nav.next { background: var(--accent); color: var(--accent-fg); }
+.nav:disabled { opacity: .3; cursor: default; }
+</style>
+
+<div id="app">
+  <div class="top"><span><b>குடியுரிமைக்கல்வி</b> · மெய்ம்மைக் கற்றல்</span><span class="count" id="count"></span></div>
+  <main id="stage" tabindex="-1" aria-live="polite"></main>
+  <div class="bottom">
+    <div class="segs" id="segs"></div>
+    <div class="navrow">
+      <button class="nav prev" id="prev" type="button">← முந்தையது</button>
+      <button class="nav next" id="next" type="button">அடுத்தது →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var METHODS = [
+    { t: 'சம்பவ அடிப்படையிலான கற்கை', e: 'Case-Based Study',
+      ex: 'பாடசாலையில் மாணவர்கள் இடையே ஏற்படும் பாகுபாடு அல்லது பொதுச் சொத்துக்களைச் சேதப்படுத்துதல் தொடர்பான சம்பவம் ஒன்றை வழங்குதல்.',
+      s: [['விமர்சனச் சிந்தனை','சம்பவத்திற்கான காரணங்களையும் விளைவுகளையும் ஆராய்தல்.'],['பிரச்சினை தீர்த்தல்','பொருத்தமான தீர்வுகளை முன்வைத்தல்.'],['சமூகத் திறன்','பிறரின் உரிமைகளையும் உணர்வுகளையும் மதித்தல்.'],['முடிவெடுத்தல்','நியாயமான தீர்வைத் தெரிவுசெய்தல்.']] },
+    { t: 'ஆதார அடிப்படையிலான செயற்பாடுகள்', e: 'Evidence-Based Activities',
+      ex: 'ஒரு சமூகப் பிரச்சினை தொடர்பான செய்தித்தாள் செய்திகள், புகைப்படங்கள், புள்ளிவிவரங்கள் அல்லது அரச ஆவணங்களை ஆய்வு செய்து முடிவுகளை முன்வைத்தல்.',
+      s: [['தகவல் அறிவு','தகவல்களைச் சேகரித்தல், ஒப்பிடுதல்.'],['விமர்சனச் சிந்தனை','ஆதாரங்களின் நம்பகத்தன்மையை மதிப்பிடுதல்.'],['தொடர்பாடல்','ஆதாரங்களுடன் கருத்துகளை முன்வைத்தல்.'],['ஊடக அறிவு','உண்மையான செய்திகளையும் தவறான தகவல்களையும் வேறுபடுத்துதல்.']] },
+    { t: 'ஆய்வு அடிப்படையிலான செயற்பாடுகள்', e: 'Research-Based Activities',
+      ex: '“எமது பிரதேசத்தில் பொதுச் சொத்துக்கள் எவ்வாறு பாதுகாக்கப்படுகின்றன?” என்ற தலைப்பில் வினாக்கொத்து, நேர்காணல் அல்லது கள ஆய்வு மேற்கொள்ளுதல்.',
+      s: [['ஆய்வுச் சிந்தனை மற்றும் தகவல் அறிவு',null],['தொடர்பாடல்','மக்களிடம் கேள்விகளைக் கேட்டு தகவல்களைப் பெறுதல்.'],['ஒத்துழைப்பு','குழுவாகத் தரவுகளைச் சேகரித்தல்.'],['விளைதிறன்','தரவுகளைப் பகுப்பாய்வு செய்து அறிக்கையைத் தயாரித்தல்.'],['முன்முயற்சி','தாமாகவே ஆய்வைத் திட்டமிடுதல்.']] },
+    { t: 'சுவரொட்டி, படக்குறிப்புகள், துண்டுப்பிரசுரம் தயாரித்தல்', e: 'Posters · Captions · Leaflets',
+      ex: '“வாக்குரிமை எமது உரிமை”, “சுற்றுச்சூழலைப் பாதுகாப்போம்” அல்லது “பொதுச் சொத்துக்களைப் பாதுகாப்போம்” என்ற தலைப்பில் விழிப்புணர்வுப் பொருட்களை உருவாக்குதல்.',
+      s: [['படைப்பாற்றல்','புதிய வடிவமைப்புகளையும் கருத்துகளையும் உருவாக்குதல்.'],['தொடர்பாடல்','செய்தியைச் சுருக்கமாகவும் தெளிவாகவும் வழங்குதல்.'],['தொழில்நுட்ப அறிவு','டிஜிட்டல் வடிவமைப்புக் கருவிகளைப் பயன்படுத்துதல்.'],['ஒத்துழைப்பு','குழுவாகப் பணிகளைப் பகிர்ந்துகொள்ளுதல்.']] },
+    { t: 'விளையாட்டு அடிப்படையிலான கற்றல்', e: 'Game-Based Learning',
+      ex: 'மாணவர்களைப் பல்வேறு அரசியல் கட்சிகளாகப் பிரித்து, தேர்தல் பிரசாரம், வாக்குப்பதிவு, வாக்கு எண்ணிக்கை ஆகியவற்றை உள்ளடக்கிய மாதிரித் தேர்தலை நடத்துதல்.',
+      s: [['விமர்சனச் சிந்தனை','வேட்பாளர்களின் கொள்கைகளை ஒப்பிடுதல்.'],['தொடர்பாடல்','தேர்தல் வாக்குறுதிகளை முன்வைத்தல்.'],['தலைமைத்துவம்','குழுக்களை வழிநடத்துதல்.'],['சமூகத் திறன்','கருத்து வேறுபாடுகளை மதித்தல்.'],['முடிவெடுத்தல்','தகவல்களின் அடிப்படையில் வாக்களித்தல்.']] },
+    { t: 'கலந்துரையாடல்', e: 'Discussions',
+      ex: '“குடிமக்கள் தமது உரிமைகளை மட்டுமன்றி கடமைகளையும் நிறைவேற்ற வேண்டுமா?” என்ற தலைப்பில் குழுக் கலந்துரையாடலை நடத்துதல்.',
+      s: [['விமர்சனச் சிந்தனை','வெவ்வேறு கருத்துகளை ஆராய்தல்.'],['தொடர்பாடல்','கருத்துகளைத் தெளிவாக முன்வைத்தல்.'],['ஒத்துழைப்பு','மற்றவர்களின் கருத்துகளுக்குச் செவிசாய்த்தல்.'],['நெகிழ்வுத்தன்மை','புதிய ஆதாரங்களின் அடிப்படையில் தமது கருத்தை மாற்றியமைத்தல்.'],['சமூகத் திறன்','கருத்து வேறுபாடுகளை நாகரிகமாகக் கையாளுதல்.']] },
+    { t: 'மின்னியல் முன்வைப்பு', e: 'PowerPoint Presentation',
+      ex: 'உள்ளூராட்சி சபையின் பணிகள், குடிமக்களின் உரிமைகள் அல்லது ஜனநாயக ஆட்சிமுறை பற்றி படங்கள், வரைபடங்கள், புள்ளிவிவரங்கள் அடங்கிய மின்னியல் முன்வைப்பைத் தயாரித்தல்.',
+      s: [['தொழில்நுட்ப அறிவு','டிஜிட்டல் கருவிகளைப் பயன்படுத்துதல்.'],['தகவல் அறிவு','நம்பகமான தகவல்களைத் தெரிவுசெய்தல்.'],['படைப்பாற்றல்','தகவல்களை ஈர்க்கக்கூடிய வகையில் ஒழுங்கமைத்தல்.'],['தொடர்பாடல்','பார்வையாளர்களுக்கு விளக்கமளித்தல்.'],['விளைதிறன்','நேரத்திற்குள் பணியை நிறைவு செய்தல்.']] },
+    { t: 'கண்காட்சிக்கூடச் செயற்பாடு', e: 'Gallery Walk',
+      ex: 'மாணவர் குழுக்கள் மனித உரிமைகள், சட்டத்தின் ஆட்சி, ஜனநாயகம், சுற்றுச்சூழல் பாதுகாப்பு போன்ற தலைப்புகளில் தயாரித்த சுவரொட்டிகள் மற்றும் ஆய்வு முடிவுகளை வகுப்பறையில் காட்சிப்படுத்துதல். ஏனைய மாணவர்கள் அவற்றைப் பார்வையிட்டு கருத்துகளையும் கேள்விகளையும் முன்வைத்தல்.',
+      s: [['தொடர்பாடல்','தமது படைப்புகளை விளக்குதல்.'],['விமர்சனச் சிந்தனை','பிற குழுக்களின் படைப்புகளை மதிப்பிடுதல்.'],['ஒத்துழைப்பு','குழுவாகப் படைப்புகளை உருவாக்குதல்.'],['படைப்பாற்றல்','காட்சிப்படுத்தும் முறைகளைத் திட்டமிடுதல்.'],['சமூகத் திறன்','பிறரின் கருத்துகளுக்கு மதிப்பளித்தல்.']] }
+  ];
+
+  var SUMMARY = [
+    ['சம்பவ அடிப்படையிலான கற்கை', ['விமர்சனச் சிந்தனை','முடிவெடுத்தல்','பிரச்சினை தீர்த்தல்']],
+    ['ஆதார அடிப்படையிலான செயற்பாடுகள்', ['தகவல் அறிவு','ஊடக அறிவு','விமர்சனச் சிந்தனை']],
+    ['ஆய்வு அடிப்படையிலான செயற்பாடுகள்', ['ஆய்வுத் திறன்','ஒத்துழைப்பு','முன்முயற்சி','விளைதிறன்']],
+    ['சுவரொட்டி மற்றும் துண்டுப்பிரசுரம்', ['படைப்பாற்றல்','தொடர்பாடல்','தொழில்நுட்ப அறிவு']],
+    ['விளையாட்டு அடிப்படையிலான கற்றல்', ['தலைமைத்துவம்','ஒத்துழைப்பு','முடிவெடுத்தல்','சமூகத் திறன்']],
+    ['கலந்துரையாடல்', ['விமர்சனச் சிந்தனை','தொடர்பாடல்','நெகிழ்வுத்தன்மை']],
+    ['மின்னியல் முன்வைப்பு', ['தொழில்நுட்ப அறிவு','தகவல் அறிவு','படைப்பாற்றல்']],
+    ['கண்காட்சிக்கூடச் செயற்பாடு', ['தொடர்பாடல்','ஒத்துழைப்பு','விமர்சனச் சிந்தனை','படைப்பாற்றல்']]
+  ];
+
+  var CYCLE = [
+    ['நிஜ வாழ்க்கைப் பிரச்சினையை அறிதல்', [], 'எ.கா. சமூகத்தில் பொதுச் சொத்துக்கள் சேதப்படுத்தப்படுதல்'],
+    ['தகவல் மற்றும் ஆதாரங்களைச் சேகரித்தல்', ['தகவல் அறிவு','ஆய்வுத் திறன்'], ''],
+    ['குழுவாக ஆராய்ந்து தீர்வுகளை உருவாக்குதல்', ['விமர்சனச் சிந்தனை','படைப்பாற்றல்','ஒத்துழைப்பு'], ''],
+    ['தீர்வுகளை முன்வைத்துச் செயற்படுத்துதல்', ['தொடர்பாடல்','தலைமைத்துவம்','தொழில்நுட்ப அறிவு'], ''],
+    ['சுயமதிப்பீடு செய்து மேம்படுத்துதல்', ['நெகிழ்வுத்தன்மை','முன்முயற்சி','விளைதிறன்'], '']
+  ];
+
+  var stage = document.getElementById('stage');
+  var segsEl = document.getElementById('segs');
+  var countEl = document.getElementById('count');
+  var prevBtn = document.getElementById('prev');
+  var nextBtn = document.getElementById('next');
+
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (k === 'class') n.className = attrs[k];
+      else if (k === 'text') n.textContent = attrs[k];
+      else if (k.indexOf('on') === 0) n.addEventListener(k.slice(2), attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    }
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function pm(open) { return el('span', { class: 'pm', 'aria-hidden': 'true', text: open ? '−' : '+' }); }
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function center(n) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        try { n.scrollIntoView({ block: 'center', inline: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' }); }
+        catch (e) { n.scrollIntoView(); }
+      });
+    });
+  }
+
+  var cur = 0;
+  var slides = [];
+
+  /* 0 — cover */
+  slides.push(function () {
+    var more = el('div', { hidden: '' }, [
+      el('p', { text: 'குடியுரிமைக்கல்வியில் இம்முறைகளைப் பயன்படுத்துவதன் மூலம் மாணவர்கள் பாடப்பொருளை மனனம் செய்வதைக் கடந்து, 21ஆம் நூற்றாண்டின் அடிப்படைத் திறன்களைச் செயற்பாட்டு ரீதியாக வளர்த்துக்கொள்ள முடியும்.' }),
+      el('div', { class: 'chips', style: 'margin-top:12px' }, ['விமர்சனச் சிந்தனை','படைப்பாற்றல்','ஒத்துழைப்பு','தொடர்பாடல்','தலைமைத்துவம்','தகவல் அறிவு'].map(function (s) { return el('span', { class: 'chip static', text: s }); }))
+    ]);
+    var btn = el('button', { class: 'reveal-btn', type: 'button', 'aria-expanded': 'false' }, [el('span', { text: 'இதனால் என்ன பயன்?' }), pm(false)]);
+    btn.addEventListener('click', function () {
+      var o = more.hidden; more.hidden = !o;
+      btn.setAttribute('aria-expanded', String(o));
+      btn.lastChild.textContent = o ? '−' : '+';
+      center(o ? more : btn);
+    });
+    return el('section', { class: 'cover' }, [
+      el('span', { class: 'eyebrow', text: 'Authentic Learning' }),
+      el('h1', { text: 'குடியுரிமைக்கல்வியில் மெய்ம்மைக் கற்றல் முறைகள் மூலம் 21ஆம் நூற்றாண்டுத் திறன்களை வளர்த்தல்' }),
+      el('div', { class: 'def' }, [
+        el('p', null, [el('em', { text: 'மெய்ம்மைக் கற்றல் (Authentic Learning)' }), ' என்பது மாணவர்கள் நிஜ வாழ்க்கையில் எதிர்கொள்ளும் பிரச்சினைகள், சமூகச் சம்பவங்கள், குடிமக்களின் பொறுப்புகள் மற்றும் நடைமுறைச் சூழ்நிலைகளை அடிப்படையாகக் கொண்டு கற்றுக்கொள்ளும் முறையாகும்.'])
+      ]),
+      btn, more
+    ]);
+  });
+
+  /* 1 — overview */
+  slides.push(function () {
+    return el('section', { class: 'stack' }, [
+      el('span', { class: 'eyebrow', text: '8 கற்றல் முறைகள்' }),
+      el('h2', { text: 'மெய்ம்மைக் கற்றல் முறைகளும் 21ஆம் நூற்றாண்டுத் திறன்களும்' }),
+      el('p', { class: 'hint', text: 'ஒரு முறையைத் தொட்டால் அதன் ஸ்லைடுக்குச் செல்லும்.' }),
+      el('div', { class: 'grid' }, METHODS.map(function (m, i) {
+        return el('button', { class: 'tile', type: 'button', onclick: function () { go(i + 2); } }, [
+          el('span', { class: 'n', text: String(i + 1) }),
+          el('span', { class: 't' }, [m.t, el('span', { class: 'e', text: m.e })])
+        ]);
+      }))
+    ]);
+  });
+
+  /* 2..9 — methods */
+  function methodSlide(i) {
+    return function () {
+      var m = METHODS[i];
+      var exBody = el('div', { class: 'body' }, [el('p', { text: m.ex })]);
+      var exHead = el('button', { class: 'card-head', type: 'button', 'aria-expanded': 'true' }, [el('span', { text: 'செயற்பாட்டு உதாரணம்' }), pm(true)]);
+      exHead.addEventListener('click', function () {
+        var o = exBody.hidden; exBody.hidden = !o;
+        exHead.setAttribute('aria-expanded', String(o)); exHead.lastChild.textContent = o ? '−' : '+';
+        center(exHead.parentNode);
+      });
+
+      var rows = [];
+      var skillList = el('div', { class: 'skills' });
+      m.s.forEach(function (sk) {
+        if (!sk[1]) { skillList.appendChild(el('div', { class: 'skill plain' }, [el('div', { class: 'plain-row', text: sk[0] })])); return; }
+        var desc = el('div', { class: 'desc', hidden: '' }, [el('p', { text: sk[1] })]);
+        var b = el('button', { type: 'button', 'aria-expanded': 'false' }, [el('span', { text: sk[0] }), pm(false)]);
+        var box = el('div', { class: 'skill' }, [b, desc]);
+        function set(open) {
+          desc.hidden = !open; box.classList.toggle('open', open);
+          b.setAttribute('aria-expanded', String(open)); b.lastChild.textContent = open ? '−' : '+';
+        }
+        b.addEventListener('click', function () { set(desc.hidden); center(box); });
+        rows.push({ set: set, isOpen: function () { return !desc.hidden; } });
+        skillList.appendChild(box);
+      });
+      var all = el('button', { class: 'link-btn', type: 'button', text: 'அனைத்தையும் விரி' });
+      all.addEventListener('click', function () {
+        var anyClosed = rows.some(function (r) { return !r.isOpen(); });
+        rows.forEach(function (r) { r.set(anyClosed); });
+        all.textContent = anyClosed ? 'அனைத்தையும் மூடு' : 'அனைத்தையும் விரி';
+        center(skillList);
+      });
+
+      return el('section', { class: 'stack' }, [
+        el('div', { class: 'mhead' }, [
+          el('span', { class: 'big', text: String(i + 1) }),
+          el('div', null, [el('h2', { text: m.t }), el('div', { class: 'eng', text: m.e })])
+        ]),
+        el('div', { class: 'cols' }, [
+          el('div', { class: 'card' }, [exHead, exBody]),
+          el('div', { class: 'stack-s' }, [
+            el('div', { class: 'row-between' }, [el('h3', { text: 'வளர்க்கப்படும் திறன்கள்' }), rows.length ? all : null]),
+            rows.length ? el('p', { class: 'hint', text: 'ஒவ்வொரு திறனையும் தொட்டு விளக்கத்தைப் பார்க்கவும்.' }) : null,
+            skillList
+          ])
+        ])
+      ]);
+    };
+  }
+  for (var mi = 0; mi < METHODS.length; mi++) slides.push(methodSlide(mi));
+
+  /* 10 — summary with skill filter */
+  slides.push(function () {
+    var skillSet = [];
+    SUMMARY.forEach(function (r) { r[1].forEach(function (s) { if (skillSet.indexOf(s) < 0) skillSet.push(s); }); });
+    var sel = null;
+    var rowEls = [];
+    var chipEls = [];
+    function apply() {
+      rowEls.forEach(function (r, i) {
+        var has = sel && SUMMARY[i][1].indexOf(sel) >= 0;
+        r.classList.toggle('on', !!has);
+        r.classList.toggle('dim', !!sel && !has);
+      });
+      chipEls.forEach(function (c) { c.b.setAttribute('aria-pressed', String(c.s === sel)); });
+    }
+    var chips = el('div', { class: 'chips' }, skillSet.map(function (s) {
+      var b = el('button', { class: 'chip', type: 'button', 'aria-pressed': 'false', text: s });
+      b.addEventListener('click', function () { sel = (sel === s) ? null : s; apply(); center(b); });
+      chipEls.push({ b: b, s: s });
+      return b;
+    }));
+    var list = el('div', { class: 'rows' }, SUMMARY.map(function (r, i) {
+      var b = el('button', { class: 'srow', type: 'button', onclick: function () { go(i + 2); } }, [
+        el('span', { class: 'm' }, [el('span', { class: 'go', text: String(i + 1) }), r[0]]),
+        el('span', { class: 's', text: r[1].join(', ') })
+      ]);
+      rowEls.push(b);
+      return b;
+    }));
+    return el('section', { class: 'stack' }, [
+      el('span', { class: 'eyebrow', text: 'சுருக்கம்' }),
+      el('h2', { text: 'ஒவ்வொரு முறையும் வளர்க்கும் திறன்கள்' }),
+      el('p', { class: 'hint', text: 'ஒரு திறனைத் தொட்டால், அதை வளர்க்கும் முறைகள் ஒளிரும். ஒரு முறையைத் தொட்டால் அதன் ஸ்லைடுக்குச் செல்லும்.' }),
+      chips, list
+    ]);
+  });
+
+  /* 11 — learning cycle */
+  slides.push(function () {
+    var items = [];
+    function openOnly(k) { items.forEach(function (it, j) { it.set(j === k ? !it.open : false); }); }
+    var steps = el('div', { class: 'steps' }, CYCLE.map(function (c, i) {
+      var det = null;
+      if (c[1].length) det = el('div', { class: 'chips' }, c[1].map(function (s) { return el('span', { class: 'chip static', text: s }); }));
+      else if (c[2]) det = el('p', { text: c[2] });
+      var detail = el('div', { class: 'detail', hidden: '' }, [det]);
+      var b = el('button', { type: 'button', 'aria-expanded': 'false' }, [el('span', { text: c[0] }), pm(false)]);
+      var box = el('div', { class: 'step' }, [
+        el('div', { class: 'rail' }, [el('div', { class: 'dot', text: String(i + 1) }), el('div', { class: 'line' })]),
+        el('div', { class: 'main' }, [b, detail])
+      ]);
+      var it = { open: false, set: function (o) {
+        it.open = o; detail.hidden = !o; box.classList.toggle('open', o);
+        b.setAttribute('aria-expanded', String(o)); b.lastChild.textContent = o ? '−' : '+';
+      } };
+      b.addEventListener('click', function () { openOnly(i); center(box); });
+      items.push(it);
+      return box;
+    }));
+    items[0].set(true);
+    return el('section', { class: 'stack' }, [
+      el('span', { class: 'eyebrow', text: 'கற்றல் சுழற்சி' }),
+      el('h2', { text: 'இந்தக் கற்றல் முறைகள் திறன்களை எவ்வாறு கட்டியெழுப்புகின்றன?' }),
+      el('p', { text: 'மெய்ம்மைக் கற்றல் முறைகள் திறன்களை வளர்ப்பதில் பின்வரும் கற்றல் சுழற்சி முக்கியமானது.' }),
+      el('p', { class: 'hint', text: 'ஒரு படியைத் தொட்டு, அங்கு வளரும் திறன்களைப் பார்க்கவும்.' }),
+      steps
+    ]);
+  });
+
+  /* 12 — teacher note */
+  slides.push(function () {
+    var mode = 'student';
+    var out = el('div');
+    var bT = el('button', { type: 'button', 'aria-pressed': 'false', text: 'ஆசிரியர் தயாரித்தால்' });
+    var bS = el('button', { type: 'button', 'aria-pressed': 'true', text: 'மாணவர்கள் தயாரித்தால்' });
+    function draw() {
+      bT.setAttribute('aria-pressed', String(mode === 'teacher'));
+      bS.setAttribute('aria-pressed', String(mode === 'student'));
+      out.textContent = '';
+      if (mode === 'teacher') {
+        out.appendChild(el('div', { class: 'single' }, [el('p', { text: 'சுவரொட்டியை ஆசிரியரே தயாரித்து மாணவர்களிடம் காட்டுதல்.' })]));
+      } else {
+        out.appendChild(el('div', { class: 'chain' }, ['மாணவர்களே பிரச்சினையைத் தெரிவுசெய்தல்','தகவல்களைச் சேகரித்தல்','குழுவாகச் சுவரொட்டியை உருவாக்குதல்','சமூகத்திடம் விளக்குவதற்கு ஏற்பாடு செய்தல்'].map(function (t) { return el('div', { text: t }); })));
+        out.appendChild(el('p', { style: 'margin-top:10px;font-weight:700;color:var(--accent)', text: 'இதுவே அதிக பயனளிக்கும்.' }));
+      }
+    }
+    bT.addEventListener('click', function () { mode = 'teacher'; draw(); center(out); });
+    bS.addEventListener('click', function () { mode = 'student'; draw(); center(out); });
+    draw();
+    return el('section', { class: 'stack' }, [
+      el('span', { class: 'eyebrow', text: 'ஆசிரியருக்கு' }),
+      el('h2', { text: 'ஆசிரியர் கவனிக்க வேண்டிய முக்கிய அம்சம்' }),
+      el('p', { text: 'இந்தக் கற்றல் முறைகளைப் பயன்படுத்துவது மட்டுமே 21ஆம் நூற்றாண்டுத் திறன்களை உறுதியாக வளர்த்துவிடாது. ஒவ்வொரு செயற்பாட்டிலும் மாணவர்களுக்கு இந்த வாய்ப்புகளை வழங்க வேண்டும்:' }),
+      el('div', { class: 'opps' }, ['சுயமாகச் சிந்திக்க','தீர்மானங்களை எடுக்க','குழுவாகப் பணியாற்ற','தமது கற்றலை மதிப்பிட'].map(function (t) { return el('div', { text: t }); })),
+      el('h3', { text: 'உதாரணம்: சுவரொட்டி' }),
+      el('p', { class: 'hint', text: 'இரண்டு நிலைகளையும் தொட்டு ஒப்பிடவும்.' }),
+      el('div', { class: 'seg', role: 'group' }, [bT, bS]),
+      out
+    ]);
+  });
+
+  /* 13 — conclusion */
+  slides.push(function () {
+    return el('section', { class: 'stack' }, [
+      el('span', { class: 'eyebrow', text: 'முடிவாக' }),
+      el('h2', { text: 'குடியுரிமைக்கல்வியில் மெய்ம்மைக் கற்றல் முறைகள் அறிவைப் பெறுவதற்கான வழிமுறைகள் மட்டுமல்ல.' }),
+      el('p', { text: 'அவை மாணவர்களை 21ஆம் நூற்றாண்டுப் பிரசைகளாக உருவாக்க உதவும் கற்பித்தல் அணுகுமுறைகளாகும்:' }),
+      el('div', { class: 'quals' }, ['சிந்திக்கக்கூடிய','பொறுப்புணர்வுள்ள','ஜனநாயக விழுமியங்களை மதிக்கின்ற','சமூகப் பிரச்சினைகளுக்குத் தீர்வுகளை முன்வைக்கக்கூடிய'].map(function (t) { return el('div', { class: 'qual', text: t }); })),
+      el('button', { class: 'reveal-btn', type: 'button', onclick: function () { go(0); } }, [el('span', { text: 'மீண்டும் தொடங்கு' }), el('span', { class: 'pm', text: '↺' })])
+    ]);
+  });
+
+  var TOTAL = slides.length;
+  var sections = ['அறிமுகம்','முறைகள்','முறை 1','முறை 2','முறை 3','முறை 4','முறை 5','முறை 6','முறை 7','முறை 8','சுருக்கம்','சுழற்சி','ஆசிரியருக்கு','முடிவு'];
+
+  var segBtns = [];
+  for (var k = 0; k < TOTAL; k++) {
+    (function (k) {
+      var b = el('button', { type: 'button', 'aria-label': 'ஸ்லைடு ' + (k + 1) + ': ' + sections[k] }, [el('i')]);
+      b.addEventListener('click', function () { go(k); });
+      segsEl.appendChild(b); segBtns.push(b);
+    })(k);
+  }
+
+  function go(n, silent) {
+    if (n < 0 || n >= TOTAL) return;
+    var back = n < cur;
+    cur = n;
+    stage.textContent = '';
+    var node = slides[n]();
+    node.classList.add('slide'); if (back) node.classList.add('back');
+    stage.appendChild(node);
+    stage.scrollTop = 0;
+    countEl.textContent = (n + 1) + ' / ' + TOTAL;
+    prevBtn.disabled = n === 0; nextBtn.disabled = n === TOTAL - 1;
+    segBtns.forEach(function (b, i) { b.className = i < n ? 'done' : (i === n ? 'cur' : ''); if (i === n) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); });
+    try { history.replaceState(null, '', '#s-' + (n + 1)); } catch (e) {}
+  }
+
+  prevBtn.addEventListener('click', function () { go(cur - 1); });
+  nextBtn.addEventListener('click', function () { go(cur + 1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') go(cur + 1);
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(cur - 1);
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(TOTAL - 1);
+  });
+
+  var sx = 0, sy = 0;
+  stage.addEventListener('touchstart', function (e) { var t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+  stage.addEventListener('touchend', function (e) {
+    var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8) go(dx < 0 ? cur + 1 : cur - 1);
+  }, { passive: true });
+
+  var start = 0;
+  var m = /^#s-(\d+)$/.exec(location.hash || '');
+  if (m) { var v = parseInt(m[1], 10) - 1; if (v >= 0 && v < TOTAL) start = v; }
+  go(start);
+  window.addEventListener('hashchange', function () {
+    var mm = /^#s-(\d+)$/.exec(location.hash || '');
+    if (mm) { var v2 = parseInt(mm[1], 10) - 1; if (v2 >= 0 && v2 < TOTAL && v2 !== cur) go(v2); }
+  });
+})();
+</script>
+
+</body></html>
